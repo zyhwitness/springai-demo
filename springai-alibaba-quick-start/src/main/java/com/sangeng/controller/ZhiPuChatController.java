@@ -50,7 +50,7 @@ public class ZhiPuChatController {
         return chatModel.call(new Prompt(List.of(systemMessage, userMessage), zhiPuAiChatOptions));
     }
 
-    @GetMapping("/chatOptions")
+    @GetMapping("/chatOptions2")
     public String chatOptions2(@RequestParam(name = "message") String message) {
         SystemMessage systemMessage = new SystemMessage("你是一个有用的AI助手");
         UserMessage userMessage = new UserMessage(message);
