@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -61,5 +62,10 @@ public class ZhiPuChatController {
                 .build();
         ChatResponse chatResponse = chatModel.call(new Prompt(List.of(systemMessage, userMessage), chatOptions));
         return chatResponse.getResult().getOutput().getText();
+    }
+
+    @GetMapping("/stream/chat")
+    public Flux<String> stream(@RequestParam(name = "query") String query) {
+        return chatModel.stream(query);
     }
 }
