@@ -19,7 +19,7 @@ public class SimpleMessageChatMemoryAdvisor implements BaseAdvisor {
     public ChatClientRequest before(ChatClientRequest chatClientRequest, AdvisorChain advisorChain) {
 
         // 通过会话id查询之前的对话记录
-        String sessionId = "test";
+        String sessionId = chatClientRequest.context().get("sessionId").toString();
         List<Message> messages = chatMemory.get(sessionId);
         if (messages == null) {
             messages = new ArrayList<>();
@@ -44,7 +44,7 @@ public class SimpleMessageChatMemoryAdvisor implements BaseAdvisor {
     public ChatClientResponse after(ChatClientResponse chatClientResponse, AdvisorChain advisorChain) {
 
         // 通过会话id查询之前的对话记录
-        String sessionId = "test";
+        String sessionId = chatClientResponse.context().get( "sessionId").toString();
         List<Message> messages = chatMemory.get(sessionId);
         if (messages == null) {
             messages = new ArrayList<>();

@@ -40,10 +40,10 @@ public class AdvisorController {
     }
 
     @GetMapping("/simpleChatMemory")
-    public String simpleChatMemory(@RequestParam(name = "query") String query) {
-
+    public String simpleChatMemory(@RequestParam(name = "query") String query, @RequestParam(name = "sessionId") String sessionId) {
         return chatClient.prompt()
                 .user(query)
+                .advisors(advisorSpec -> advisorSpec.param("sessionId", sessionId))
                 .advisors(new SimpleMessageChatMemoryAdvisor())
                 .call().content();
     }
