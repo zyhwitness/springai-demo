@@ -2,6 +2,7 @@ package com.sangeng.controller;
 
 import com.sangeng.advisor.SGCallAdvisor1;
 import com.sangeng.advisor.SGCallAdvisor2;
+import com.sangeng.advisor.SimpleMessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
@@ -35,6 +36,15 @@ public class AdvisorController {
                 .user(query)
                 .advisors(new SGCallAdvisor1(), new SGCallAdvisor2())
                 .options(chatOptions)
+                .call().content();
+    }
+
+    @GetMapping("/simpleChatMemory")
+    public String simpleChatMemory(@RequestParam(name = "query") String query) {
+
+        return chatClient.prompt()
+                .user(query)
+                .advisors(new SimpleMessageChatMemoryAdvisor())
                 .call().content();
     }
 }
