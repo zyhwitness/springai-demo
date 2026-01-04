@@ -21,6 +21,9 @@ public class ZhiPuChatMemoryController {
         // 创建 MessageWindowChatMemory
         MessageWindowChatMemory messageWindowChatMemory = MessageWindowChatMemory
                 .builder()
+                //TODO 如何自定义chatMemoryRepository，从而将消息存储在mysql或redis中？
+//                .maxMessages()
+//                .chatMemoryRepository()
                 .build();
 
         //创建 MessageChatMemoryAdvisor
