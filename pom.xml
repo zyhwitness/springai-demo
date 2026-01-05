@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>springai-alibaba-quick-start</module>
+        <module>springai-alibaba-rag</module>
     </modules>
 
 
