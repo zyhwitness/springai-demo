@@ -3,11 +3,15 @@ package com.sangeng.controller;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -20,9 +24,22 @@ import java.util.List;
 public class CoffeeController {
 
     private final VectorStore vectorStore;
+    private final ChatClient chatClient;
 
-    public CoffeeController(VectorStore vectorStore) {
+    public CoffeeController(VectorStore vectorStore, ChatClient.Builder chatClientBuilder) {
         this.vectorStore = vectorStore;
+
+        VectorStoreDocumentRetriever vectorStoreDocumentRetriever = VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .topK(3)
+                .similarityThreshold(0.5)
+                .build();
+        RetrievalAugmentationAdvisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(vectorStoreDocumentRetriever)
+                .build();
+        this.chatClient = chatClientBuilder
+                .defaultAdvisors(retrievalAugmentationAdvisor)
+                .build();
     }
 
     @GetMapping("/import")
@@ -62,5 +79,23 @@ public class CoffeeController {
             e.printStackTrace();
             return "导入失败: " + e.getMessage();
         }
+    }
+
+    /**
+     * 新增的RAG问答接口，明确展示查询向量数据库的过程
+     *
+     * @param question 用户的问题
+     * @return AI基于检索到的信息生成的回答
+     */
+    @GetMapping("/rag-ask")
+    public String ragAskQuestion(@RequestParam("question") String question) {
+        // 先从向量数据库中检索相关信息
+        // 这里会使用RetrievalAugmentationAdvisor自动检索相关文档
+        // 将问题和检索到的上下文一起发送给AI模型生成回答
+        return chatClient.prompt()
+                .system("你是三更咖啡的服务员，你需要回答用户的问题")
+                .user(question)
+                .call()
+                .content();
     }
 }
