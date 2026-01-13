@@ -1,5 +1,6 @@
 package com.sangeng.controller;
 
+import com.sangeng.tool.TimeTools;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -95,6 +96,7 @@ public class CoffeeController {
         return chatClient.prompt()
                 .system("你是三更咖啡的服务员，你需要回答用户的问题")
                 .user(question)
+                .tools(new TimeTools())
                 .call()
                 .content();
     }
