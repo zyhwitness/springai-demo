@@ -10,6 +10,7 @@
     <modules>
         <module>springai-alibaba-quick-start</module>
         <module>springai-alibaba-rag</module>
+        <module>springai-alibaba-mcp-server</module>
     </modules>
 
 
