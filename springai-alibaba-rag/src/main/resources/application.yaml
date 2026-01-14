@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8888
   servlet:
     encoding:
       charset: utf-8
@@ -20,6 +20,13 @@ spring:
         options:
           model: embedding-3 # 使用的嵌入模型名称（embedding-3）
           dimensions: 256 # 嵌入向量的维度（256维）
+
+    mcp:
+      client:
+        sse:
+          connections:
+            server1:
+              url: http://localhost:8080 # mcp服务url
 
     # 向量存储配置
     vectorstore:

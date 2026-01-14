@@ -1,6 +1,5 @@
 package com.sangeng.controller;
 
-import com.sangeng.tool.TimeTools;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -8,6 +7,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +27,7 @@ public class CoffeeController {
     private final VectorStore vectorStore;
     private final ChatClient chatClient;
 
-    public CoffeeController(VectorStore vectorStore, ChatClient.Builder chatClientBuilder) {
+    public CoffeeController(VectorStore vectorStore, ChatClient.Builder chatClientBuilder, ToolCallbackProvider toolCallbackProvider) {
         this.vectorStore = vectorStore;
 
         VectorStoreDocumentRetriever vectorStoreDocumentRetriever = VectorStoreDocumentRetriever.builder()
@@ -40,6 +40,8 @@ public class CoffeeController {
                 .build();
         this.chatClient = chatClientBuilder
                 .defaultAdvisors(retrievalAugmentationAdvisor)
+//                .defaultTools(new TimeTools())
+                .defaultToolCallbacks(toolCallbackProvider.getToolCallbacks())
                 .build();
     }
 
@@ -96,7 +98,7 @@ public class CoffeeController {
         return chatClient.prompt()
                 .system("你是三更咖啡的服务员，你需要回答用户的问题")
                 .user(question)
-                .tools(new TimeTools())
+//                .tools(new TimeTools())
                 .call()
                 .content();
     }
