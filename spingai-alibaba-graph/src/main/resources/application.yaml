@@ -1,0 +1,17 @@
+# 服务器配置
+server:
+  port: 8889  # 应用服务监听端口，默认8889
+
+spring:
+  # 应用基本信息配置
+  application:
+    name: sangeng-graph  # 应用名称
+
+  # Spring AI 配置
+  ai:
+    # 智谱AI大模型配置
+    zhipuai:
+      api-key: "3a6d297d29284ed6871cfa9093f5bf14.mzwgtUNMpmYz8ihn"  # 智谱API密钥（从环境变量ZHIPU_KEY获取）
+      chat:
+        options:
+          model: glm-4.6  # 使用的聊天模型名称（GLM-4.6）
