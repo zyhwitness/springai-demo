@@ -25,6 +25,7 @@ public class GraphConfig {
 
         // 定义状态图（状态，节点，边）
 
+        // 创建KeyStrategyFactory（ReplaceStrategy -> 替换策略）
         KeyStrategyFactory keyStrategyFactory = () -> Map.of("input1", new ReplaceStrategy(),
                 "input2", new ReplaceStrategy());
 
