@@ -34,9 +34,14 @@ public class GraphController {
     }
 
     @GetMapping("/simpleGraph")
-    public Map<String, Object> simpleGraph(@RequestParam String word) {
-        Optional<OverAllState> optionalOverAllState = simpleGraph.call(Map.of("word", word));
-        log.info("optionalOverAllState: {}", optionalOverAllState);
-        return optionalOverAllState.map(OverAllState::data).orElse(Map.of());
+    public Map<String, Object> simpleGraph(@RequestParam("word") String word) {
+        try {
+            Optional<OverAllState> optionalOverAllState = simpleGraph.call(Map.of("word", word));
+            log.info("optionalOverAllState: {}", optionalOverAllState);
+            return optionalOverAllState.map(OverAllState::data).orElse(Map.of());
+        } catch (Exception e) {
+            log.error("Error executing simpleGraph", e);
+            return Map.of("error", e.getMessage());
+        }
     }
 }
