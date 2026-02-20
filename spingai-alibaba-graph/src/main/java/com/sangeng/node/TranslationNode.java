@@ -16,8 +16,8 @@ public class TranslationNode implements NodeAction {
 
     private final ChatClient chatClient;
 
-    public TranslationNode(ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public TranslationNode(ChatClient.Builder chatClient) {
+        this.chatClient = chatClient.build();
     }
 
     @Override

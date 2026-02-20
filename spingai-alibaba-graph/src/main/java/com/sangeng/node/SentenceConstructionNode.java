@@ -16,8 +16,8 @@ public class SentenceConstructionNode implements NodeAction {
 
     private final ChatClient chatClient;
 
-    public SentenceConstructionNode(ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public SentenceConstructionNode(ChatClient.Builder chatClient) {
+        this.chatClient = chatClient.build();
     }
 
     @Override

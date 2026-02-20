@@ -1,15 +1,15 @@
 package com.sangeng.config;
 
-import com.alibaba.cloud.ai.graph.CompiledGraph;
-import com.alibaba.cloud.ai.graph.KeyStrategyFactory;
-import com.alibaba.cloud.ai.graph.OverAllState;
-import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.*;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
+import com.sangeng.node.SentenceConstructionNode;
+import com.sangeng.node.TranslationNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -56,6 +56,25 @@ public class GraphConfig {
         stateGraph.addEdge("node2", StateGraph.END);
 
         // 编译生成CompiledGraph后注入Spring容器
+        return stateGraph.compile();
+
+    }
+
+    @Bean("simpleGraph")
+    public CompiledGraph simpleGraph(ChatClient.Builder chatClient) throws GraphStateException {
+        KeyStrategyFactory keyStrategyFactory = () -> Map.of("word", new ReplaceStrategy(),
+                "sentence", new ReplaceStrategy(),
+                "translation", new ReplaceStrategy());
+        // 定义状态
+        StateGraph stateGraph = new StateGraph("simpleGraph", keyStrategyFactory);
+
+        stateGraph.addNode("sentence_construction", AsyncNodeAction.node_async(new SentenceConstructionNode(chatClient)));
+        stateGraph.addNode("translation", AsyncNodeAction.node_async(new TranslationNode(chatClient)));
+
+        stateGraph.addEdge(StateGraph.START, "sentence_construction");
+        stateGraph.addEdge("sentence_construction", "translation");
+        stateGraph.addEdge("translation", StateGraph.END);
+
         return stateGraph.compile();
 
     }
