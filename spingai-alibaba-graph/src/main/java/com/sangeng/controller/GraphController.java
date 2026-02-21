@@ -21,11 +21,16 @@ public class GraphController {
     private final CompiledGraph compiledGraph;
     private final CompiledGraph simpleGraph;
     private final CompiledGraph conditionalGraph;
+    private final CompiledGraph loopGraph;
 
-    public GraphController(@Qualifier("quickStartGraph") CompiledGraph compiledGraph, @Qualifier("simpleGraph") CompiledGraph simpleGraph, @Qualifier("conditionalGraph") CompiledGraph conditionalGraph) {
+    public GraphController(@Qualifier("quickStartGraph") CompiledGraph compiledGraph,
+                           @Qualifier("simpleGraph") CompiledGraph simpleGraph,
+                           @Qualifier("conditionalGraph") CompiledGraph conditionalGraph,
+                           @Qualifier("loopGraph") CompiledGraph loopGraph) {
         this.compiledGraph = compiledGraph;
         this.simpleGraph = simpleGraph;
         this.conditionalGraph = conditionalGraph;
+        this.loopGraph = loopGraph;
     }
 
     @GetMapping("/quickStartGraph")
@@ -55,6 +60,18 @@ public class GraphController {
             return optionalOverAllState.map(OverAllState::data).orElse(Map.of());
         } catch (Exception e) {
             log.error("Error executing conditionalGraph", e);
+            return Map.of("error", e.getMessage());
+        }
+    }
+
+    @GetMapping("/loopGraph")
+    public Map<String, Object> loopGraph(@RequestParam("topic") String topic) {
+        try {
+            Optional<OverAllState> optionalOverAllState = loopGraph.call(Map.of("topic", topic));
+            log.info("optionalOverAllState: {}", optionalOverAllState);
+            return optionalOverAllState.map(OverAllState::data).orElse(Map.of());
+        } catch (Exception e) {
+            log.error("Error executing loopGraph", e);
             return Map.of("error", e.getMessage());
         }
     }
