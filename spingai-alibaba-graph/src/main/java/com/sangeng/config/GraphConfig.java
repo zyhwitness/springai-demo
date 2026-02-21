@@ -1,12 +1,13 @@
 package com.sangeng.config;
 
 import com.alibaba.cloud.ai.graph.*;
+import com.alibaba.cloud.ai.graph.action.AsyncEdgeAction;
 import com.alibaba.cloud.ai.graph.action.AsyncNodeAction;
+import com.alibaba.cloud.ai.graph.action.EdgeAction;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
-import com.sangeng.node.SentenceConstructionNode;
-import com.sangeng.node.TranslationNode;
+import com.sangeng.node.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -74,6 +75,39 @@ public class GraphConfig {
         stateGraph.addEdge(StateGraph.START, "sentence_construction");
         stateGraph.addEdge("sentence_construction", "translation");
         stateGraph.addEdge("translation", StateGraph.END);
+
+        return stateGraph.compile();
+
+    }
+
+    /**
+     * 创建一个条件边图
+     *
+     * @param chatClient
+     * @return
+     * @throws GraphStateException
+     */
+    @Bean("conditionalGraph")
+    public CompiledGraph conditionalGraph(ChatClient.Builder chatClient) throws GraphStateException {
+        KeyStrategyFactory keyStrategyFactory = () -> Map.of("topic", new ReplaceStrategy());
+        // 定义状态
+        StateGraph stateGraph = new StateGraph("conditionalGraph", keyStrategyFactory);
+
+        stateGraph.addNode("generate_joke", AsyncNodeAction.node_async(new GenerateJokeNode(chatClient)));
+        stateGraph.addNode("evaluate_joke", AsyncNodeAction.node_async(new EvaluateJokesNode(chatClient)));
+        stateGraph.addNode("enhance_joke_quality", AsyncNodeAction.node_async(new EnhanceJokeQualityNode(chatClient)));
+
+        stateGraph.addEdge(StateGraph.START, "generate_joke");
+        stateGraph.addEdge("generate_joke", "evaluate_joke");
+        // 条件边，拿评估节点后状态中的result字段判断，如果result为优秀则结束，否则进入增强节点
+        stateGraph.addConditionalEdges("evaluate_joke", AsyncEdgeAction.edge_async(new EdgeAction() {
+            @Override
+            public String apply(OverAllState state) throws Exception {
+                return state.value("result", "优秀");
+            }
+        }), Map.of("优秀", StateGraph.END,
+                "不够优秀", "enhance_joke_quality"));
+        stateGraph.addEdge("enhance_joke_quality", StateGraph.END);
 
         return stateGraph.compile();
 

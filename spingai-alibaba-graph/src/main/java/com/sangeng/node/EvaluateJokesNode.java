@@ -38,6 +38,6 @@ public class EvaluateJokesNode implements NodeAction {
         String content = chatClient.prompt().user(promptTemplate.render()).call().content();
 
         // 将结果保存到工作流状态中
-        return Map.of("result", content);
+        return Map.of("result", content.trim());
     }
 }
